@@ -9,23 +9,19 @@ import java.util.List;
 
 public class FromServer {
 
-
-
     // Obtain message JSON object via HTTP Get method
-
-    public static void updateMessage(){
+    public static void updateMessage(final List<MainActivity.Message> dialogue){
         Thread thread = new Thread(new Runnable() {                                    // Execute by a independent thread
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://45.19.61.246:5000/chatUpdate");  // URL for the target server
+                    URL url = new URL("http://45.19.61.246:5000/chatUpdate");     // URL for the target server
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();  // Setup a connection
-                    InputStream in = new BufferedInputStream(conn.getInputStream());
+                    InputStream in = new BufferedInputStream(conn.getInputStream());    // Capture the response
 
-                    List<MainActivity.Message> message = MainActivity.updateDialogue(in);
+                    List<MainActivity.Message> message = MainActivity.updateDialogue(in, dialogue); // Update the dialogue
 
-                    Log.v("chatUpdate", message.get(0).user + message.get(0).text);  // Show first mesage on the log
-
+                    //Log.v("chatUpdate", message.get(0).user + message.get(0).text);  // Show first mesage on the log
                     in.close();
                     conn.disconnect();                            // Disconnect
                 }catch(Exception e){Log.e("chatUpdate", e.toString());}
@@ -33,7 +29,4 @@ public class FromServer {
         });
         thread.start();
     }
-
-
-
 }

@@ -23,7 +23,7 @@ public class ToServer {
                     conn.setDoInput(true);
 
                     JSONObject json = new JSONObject();           // Create a JSON object
-                    json.put("user", "Android Studio");          // Input data to JSON
+                    json.put("user", MainActivity.my_identity);          // Input data to JSON
                     json.put("text", message_out);
 
                     Log.v("json", json.toString());          // Show JSON data on the log

@@ -23,7 +23,7 @@ public class MessageListAdapter extends RecyclerView.Adapter{
     @Override
     public int getItemViewType(int position){
         String user = mdata.get(position).user;
-        if (user.equals("me")){
+        if (user.equals(MainActivity.my_identity)){
             return 0;
         }
         return 1;

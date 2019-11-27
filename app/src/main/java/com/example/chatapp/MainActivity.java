@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Message> dialogue = new ArrayList<>();                    // The dialogue data list
     public String message_out;                                                 // The dialogue sent from cellphone
+    final static String my_identity = "Computer";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,34 +49,28 @@ public class MainActivity extends AppCompatActivity {
                         mEdit.getText().clear();                                // Clear input box after pressing "send" button
 
                         ToServer.sendPost(message_out);                         // Send dialogue to server
-                        dialogue.add(new Message("me", message_out));       // Record sent dialogue
+                        dialogue.add(new Message(my_identity, message_out));       // Record sent dialogue
 
-                        FromServer.updateMessage();                             // Update whole dialogue from server
+                        FromServer.updateMessage(dialogue);                             // Update whole dialogue from server
 
                         recyclerView.setAdapter(new MessageListAdapter(dialogue)); // Display messages on the screen
                     }
                 });
     }
 
-    // JSON parser for the response of server
-    public static List<Message> updateDialogue(InputStream in) throws IOException {
+    // Update the dialogue by JSON parser for the response of server
+    public static List<Message> updateDialogue(InputStream in, List<Message> dialogue) throws IOException {
         JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
         try {
-            return readMessagesArray(reader);
+            reader.beginArray();
+            while (reader.hasNext()) {
+                dialogue.add(readMessage(reader));
+            }
+            reader.endArray();
+            return dialogue;
         } finally {
             reader.close();
         }
-    }
-
-    public static List<Message> readMessagesArray(JsonReader reader) throws IOException {
-        List<Message> messages = new ArrayList<>();
-
-        reader.beginArray();
-        while (reader.hasNext()) {
-            messages.add(readMessage(reader));
-        }
-        reader.endArray();
-        return messages;
     }
 
     public static Message readMessage(JsonReader reader) throws IOException {
