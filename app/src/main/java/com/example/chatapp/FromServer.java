@@ -1,5 +1,6 @@
 package com.example.chatapp;
 
+import android.net.Uri;
 import android.util.Log;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -15,13 +16,21 @@ public class FromServer {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("http://45.19.61.246:5000/chatUpdate");     // URL for the target server
+                    String host = "45.19.61.246:5000";  //IP address of target server
+                    Uri uri = new Uri.Builder()
+                            .scheme("http")
+                            .encodedAuthority(host)
+                            .path("chatUpdate")
+                            .appendQueryParameter("begin", Long.toString(MainActivity.latest_message_time))
+                            .build();
+
+                    URL url = new URL(uri.toString());
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();  // Setup a connection
                     InputStream in = new BufferedInputStream(conn.getInputStream());    // Capture the response
 
                     List<MainActivity.Message> message = MainActivity.updateDialogue(in, dialogue); // Update the dialogue
 
-                    //Log.v("chatUpdate", message.get(0).user + message.get(0).text);  // Show first mesage on the log
+                    //Log.v("chatUpdate", message.get(0).user + message.get(0).text);  // Show first message on the log
                     in.close();
                     conn.disconnect();                            // Disconnect
                 }catch(Exception e){Log.e("chatUpdate", e.toString());}

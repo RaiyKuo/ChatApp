@@ -9,7 +9,7 @@ import java.net.URL;
 public class ToServer {
 
     // Create JSON and sending via HTTP POST method
-    public static void sendPost(final String message_out){
+    public static void sendPost(final String message_out, final long now){
         Thread thread = new Thread(new Runnable() {                                    // Execute by a independent thread
             @Override
             public void run() {
@@ -23,6 +23,7 @@ public class ToServer {
                     conn.setDoInput(true);
 
                     JSONObject json = new JSONObject();           // Create a JSON object
+                    json.put("time", now);          // Input data to JSON
                     json.put("user", MainActivity.my_identity);          // Input data to JSON
                     json.put("text", message_out);
 
