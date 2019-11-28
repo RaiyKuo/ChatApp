@@ -6,9 +6,7 @@ import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class ToServer {
-
-    // Create JSON and sending via HTTP POST method
+public class ToServer {      // Create JSON and sending via HTTP POST method
     public static void sendPost(final String message_out, final long now){
         Thread thread = new Thread(new Runnable() {                                    // Execute by a independent thread
             @Override
@@ -22,23 +20,18 @@ public class ToServer {
                     conn.setDoOutput(true);
                     conn.setDoInput(true);
 
-                    JSONObject json = new JSONObject();           // Create a JSON object
-                    json.put("time", now);          // Input data to JSON
-                    json.put("user", MainActivity.my_identity);          // Input data to JSON
+                    JSONObject json = new JSONObject();                 // Create a JSON object
+                    json.put("time", now);                       // Input data to JSON
+                    json.put("user", MainActivity.my_identity);  // Input data to JSON
                     json.put("text", message_out);
 
-                    Log.v("json", json.toString());          // Show JSON data on the log
-
                     DataOutputStream outstream = new DataOutputStream(conn.getOutputStream());
-                    outstream.writeBytes(json.toString());        // Send to server
+                    outstream.writeBytes(json.toString());              // Send to server
                     outstream.flush();
                     outstream.close();
 
-                    String response = conn.getResponseMessage();  // Server response
-                    Log.v("response", response);             // log the response
-
-                    conn.disconnect();                            // Disconnect
-
+                    conn.getResponseMessage();
+                    conn.disconnect();
                 }catch(Exception e){
                     Log.e("sendPost", e.toString());
                 }
@@ -46,5 +39,4 @@ public class ToServer {
         });
         thread.start();
     }
-
 }
