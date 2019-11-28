@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.util.JsonReader;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -56,9 +57,10 @@ public class MainActivity extends AppCompatActivity {
                         ToServer.sendPost(message_out, now);                           // Send dialogue to server
                         //dialogue.add(new Message(now, my_identity, message_out)); // Record sent dialogue
                         //latest_message_time = max(now, latest_message_time);
+
+                        FromServer.updateMessage(dialogue);                       // Update whole dialogue from server
                     }
                 });
-        FromServer.updateMessage(dialogue);                       // Update whole dialogue from server
         recyclerView.setAdapter(new MessageListAdapter(dialogue)); // Display messages on the screen
     }
 
@@ -69,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
             reader.beginArray();
             while (reader.hasNext()) {
                 dialogue.add(readMessage(reader));
-
             }
             reader.endArray();
             return dialogue;
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 reader.skipValue();
             }
         }
+        Log.v("chatUpdate", text);
         reader.endObject();
 
         latest_message_time = max(time, latest_message_time); // Update time of latest message
