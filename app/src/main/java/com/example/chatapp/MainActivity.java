@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static ArrayList<Message> dialogue = new ArrayList<>();      // The dialogue data list
     final static String my_identity = "Computer";                       // Your ID
-    static long latest_message_time = (long) 0.0;                       // For update message begin position
+    static int update_counter = 0;                                    //  Counter for many updates
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +43,8 @@ public class MainActivity extends AppCompatActivity {
                 {
                     public void onClick(View view)
                     {
-                        ToServer.sendPost(mEdit.getText().toString(), System.currentTimeMillis()/1000);
-                        // Retrieve text from input box and send it to the server
-                        mEdit.getText().clear();   // Clear input box after pressing "send" button
+                        ToServer.sendPost(mEdit.getText().toString()); // Send the text of input box to server
+                        mEdit.getText().clear();                       // Clear input box after pressing "send" button
                     }
                 });
         AutoRefresh(recyclerView, 2500);  // AutoRefresh the incoming new message and update display
@@ -58,23 +57,16 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                long temp = latest_message_time;
-
-                FromServer.updateMessage(dialogue, latest_message_time);   // Update whole dialogue data from server
+                FromServer.updateMessage();        // Update data from server
 
                 MessageListAdapter adapter = new MessageListAdapter(dialogue);
-                recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
+                recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState(); // Save current display position
+                recyclerView.setAdapter(adapter);  // Update the scree display
 
-                if (!dialogue.isEmpty()){
-                    latest_message_time = dialogue.get(dialogue.size() - 1).timestamp; // Update time of latest message
-                }
-
-                recyclerView.setAdapter(adapter);                          // Update the scree display
-
-                if (latest_message_time != temp) {
-                    recyclerView.scrollToPosition(adapter.getItemCount() - 1);   // Scroll to bottom after every update
-                } else {
-                    recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);  // Keep the same focus position
+                if (update_counter == 0) {         // Keep the same focus position
+                    recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                } else {                           // Scroll to bottom after every update
+                    recyclerView.scrollToPosition(adapter.getItemCount() - 1);
                 }
 
                 AutoRefresh(recyclerView, cycletime);
